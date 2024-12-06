@@ -1,6 +1,8 @@
 const itemForm = document.getElementById('item-form');
 const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
+const clearBtn = document.getElementById('clear');
+const itemFilter = document.getElementById('filter');
 
 // Función addItem
 function addItem(e) {
@@ -20,12 +22,16 @@ function addItem(e) {
   //Variable button que llama a a función
   const button = createButton('remove-item btn-link text-red');
   li.appendChild(button);
- 
-  // Agrega item a la lista
-  itemList.appendChild(li);
-  
-  console.log(itemList);
 
+  //Agréga item a la lista
+  itemList.appendChild(li);
+  //Muestra en consola el item que se agregó
+  console.log('Artículo agregado: ' + itemList.appendChild(li).innerText);
+
+  //Llama funcion checkItems
+  checkItems();
+
+  //Vacia el valor del input
   itemInput.value = '';
 }
 
@@ -45,4 +51,55 @@ function createIcon(classes) {
   return icon;
 }
 
+//Función removeItem
+function removeItem(e) {
+  if (e.target.parentElement.classList.contains('remove-item')) {
+    if (
+      confirm('¿Estas seguro de que deseas eliminar este artículo de la lista?')
+    ) {
+      //Remuve el asritulo selecionado
+      e.target.parentElement.parentElement.remove();
+      //Muestra el artículo eliminado
+      console.log(
+        'Artículo eliminado: ' + e.target.parentElement.parentElement.innerText
+      );
+      //Llama funcion checkItems
+      checkItems();
+    }
+  }
+}
+
+//Función clearItems
+function clearItems(e) {
+  e.preventDefault();
+  for (let i = itemList.children.length - 1; i >= 0; i--) {
+    const itemToRemove = itemList.children[i];
+    // Muestra el texto del <li> que se está eliminando
+    console.log('Artículo eliminado: ' + itemToRemove.innerText);
+    itemList.removeChild(itemToRemove);
+  }
+  //Llama funcion checkItems
+  checkItems();
+}
+
+//Función checkItems
+function checkItems() {
+  const items = itemList.querySelectorAll('li');
+  console.log(items);
+  //Verifica que existan items <li> en la lista <ul>
+  if (items.length === 0) {
+    //Si no los hay esconde el filtro y el boton "Limpiar todo"
+    clearBtn.style.display = 'none';
+    itemFilter.style.display = 'none';
+    //Si los hay muestra el filtro y el boton "Limpiar todo"
+  } else {
+    clearBtn.style.display = 'block';
+    itemFilter.style.display = 'block';
+  }
+}
+
+// Agregar los eventListeners
 itemForm.addEventListener('submit', addItem);
+itemList.addEventListener('click', removeItem);
+clearBtn.addEventListener('click', clearItems);
+checkItems();
