@@ -82,10 +82,24 @@ function clearItems(e) {
   checkItems();
 }
 
+//Función filerItems
+function filterItems(e){
+  const items = itemList.querySelectorAll('li');
+  const filter_text = e.target.value.toLowerCase();
+  //Verifica que existan conincidencias con los items y los va filtrando
+  items.forEach((item) =>{
+    const itemName = item.firstChild.textContent.toLowerCase();
+    if (itemName.indexOf(filter_text) != -1) {
+      item.style.display = 'flex';
+    } else{
+      item.style.display = 'none';
+    }
+  });
+}
+
 //Función checkItems
 function checkItems() {
   const items = itemList.querySelectorAll('li');
-  console.log(items);
   //Verifica que existan items <li> en la lista <ul>
   if (items.length === 0) {
     //Si no los hay esconde el filtro y el boton "Limpiar todo"
@@ -102,4 +116,5 @@ function checkItems() {
 itemForm.addEventListener('submit', addItem);
 itemList.addEventListener('click', removeItem);
 clearBtn.addEventListener('click', clearItems);
+itemFilter.addEventListener('input', filterItems);
 checkItems();
