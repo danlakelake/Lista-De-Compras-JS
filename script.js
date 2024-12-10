@@ -4,38 +4,57 @@ const itemList = document.getElementById('item-list');
 const clearBtn = document.getElementById('clear');
 const itemFilter = document.getElementById('filter');
 
-// Función addItem
-function addItem(e) {
+// Muestra los artículos almacenados en LocalStorage en el DOM
+function displayItems(){
+  const itemFromStorage = getItemsFromStorage();
+  // Recorre cada artículo almacenado en LocalStorage y los añade a la Lista
+  itemFromStorage.forEach(item => addItemToDOM(item));
+  // Llama función checkItems
+  checkItems();
+}
+
+// Maneja el evento de envío del formulario para agregar un nuevo elemento
+function onAddItemSubmit(e) {
   e.preventDefault();
+  // Obtiene el valor del input
+  const newItem = itemInput.value; 
 
-  const newItem = itemInput.value;
-
-  //Validación del Input
+  // Validación del input: Verifica si el campo está vacío
   if (newItem === '') {
-    alert('Please add an item');
-    return;
+    alert('Please add an item'); 
+    return; 
   }
-  //Crea un list item
-  const li = document.createElement('li');
-  li.appendChild(document.createTextNode(newItem));
+  // Añade el nuevo elemento al DOM
+  addItemToDOM(newItem);
 
-  //Variable button que llama a a función
-  const button = createButton('remove-item btn-link text-red');
-  li.appendChild(button);
+  // Guarda el nuevo elemento en LocalStorage
+  addItemToStorage(newItem);
 
-  //Agréga item a la lista
-  itemList.appendChild(li);
-  //Muestra en consola el item que se agregó
-  console.log('Artículo agregado: ' + itemList.appendChild(li).innerText);
-
-  //Llama funcion checkItems
+  // Verifica si la lista de elementos está vacía
   checkItems();
 
-  //Vacia el valor del input
+  // Limpia el valor del input después de agregar el elemento
   itemInput.value = '';
 }
 
-//Función createButton
+// Añade un nuevo elemento a la lista del DOM
+function addItemToDOM(item){
+  // Crea un elemento <li> y le añade el texto del item
+  const li = document.createElement('li');
+  li.appendChild(document.createTextNode(item));
+
+  // Crea un botón de eliminación utilizando la función createButton y lo agrega al <li>
+  const button = createButton('remove-item btn-link text-red');
+  li.appendChild(button);
+
+  // Agrega el elemento <li> completo a la lista existente en el DOM
+  itemList.appendChild(li);
+
+  // Muestra en la consola el texto del elemento añadido
+  console.log('Artículo agregado: ' + itemList.appendChild(li).innerText);
+}
+
+// Crea un botón con clases específicas y añade el icono x-mark
 function createButton(classes) {
   const button = document.createElement('button');
   button.className = classes;
@@ -44,77 +63,113 @@ function createButton(classes) {
   return button;
 }
 
-//Función createIcon
+// Crea un elemento <i> con las clases especificadas
 function createIcon(classes) {
   const icon = document.createElement('i');
   icon.className = classes;
   return icon;
 }
 
-//Función removeItem
+// Agrega un nuevo elemento a la lista almacenada en LocalStorage
+function addItemToStorage(item){
+  // Obtiene los elementos actuales desde LocalStorage
+  const itemFromStorage = getItemsFromStorage();
+  // Añade el nuevo elemento a la lista
+  itemFromStorage.push(item);
+  //Convertir respuesta en JSON string y agregarla en el LocalStorage
+  localStorage.setItem('items', JSON.stringify(itemFromStorage));
+}
+
+// Obtiene los elementos almacenados en LocalStorage y los retorna como un arreglo
+function getItemsFromStorage(){
+  // Verifica si no existen elementos almacenados bajo la clave 'items' en LocalStorage
+  if (localStorage.getItem('items') === null) {
+    // Si no existen, inicializa un arreglo vacío
+    itemFromStorage = [];
+  } else {
+    // Si existen, los convierte de una cadena JSON a un objeto JavaScript
+    itemFromStorage = JSON.parse(localStorage.getItem('items'));
+  }
+  // Retorna el arreglo con los elementos
+  return itemFromStorage;
+}
+
+
+// Elimina un elemento de la lista y actualiza el estado del DOM
 function removeItem(e) {
+  // Verifica si se hizo clic en un botón con la clase 'remove-item'
   if (e.target.parentElement.classList.contains('remove-item')) {
-    if (
-      confirm('¿Estas seguro de que deseas eliminar este artículo de la lista?')
-    ) {
-      //Remuve el asritulo selecionado
+    // Solicita confirmación antes de eliminar el elemento
+    if (confirm('¿Estás seguro de que deseas eliminar este artículo de la lista?')) {
+      // Elimina el elemento seleccionado del DOM
       e.target.parentElement.parentElement.remove();
-      //Muestra el artículo eliminado
+      
+      // Muestra en la consola el nombre del artículo eliminado
       console.log(
         'Artículo eliminado: ' + e.target.parentElement.parentElement.innerText
       );
-      //Llama funcion checkItems
+      
+      // Verifica si quedan elementos en la lista
       checkItems();
     }
   }
 }
 
-//Función clearItems
+// Elimina todos los elementos de la lista y actualiza el estado del DOM
 function clearItems(e) {
   e.preventDefault();
+  // Recorre la lista de elementos en orden inverso para eliminarlos uno por uno
   for (let i = itemList.children.length - 1; i >= 0; i--) {
     const itemToRemove = itemList.children[i];
-    // Muestra el texto del <li> que se está eliminando
+    // Muestra en la consola el texto del elemento <li> que se está eliminando
     console.log('Artículo eliminado: ' + itemToRemove.innerText);
-    itemList.removeChild(itemToRemove);
+    itemList.removeChild(itemToRemove); // Elimina el elemento del DOM
   }
-  //Llama funcion checkItems
+  // Verifica si la lista está vacía y actualiza el estado del DOM
   checkItems();
 }
 
-//Función filerItems
-function filterItems(e){
+// Filtra los elementos de la lista según el texto ingresado en el campo de búsqueda
+function filterItems(e) {
   const items = itemList.querySelectorAll('li');
+  // Convierte el texto del campo de búsqueda a minúsculas
   const filter_text = e.target.value.toLowerCase();
-  //Verifica que existan conincidencias con los items y los va filtrando
-  items.forEach((item) =>{
+
+  // Recorre cada elemento de la lista y verifica si coincide con el texto de búsqueda
+  items.forEach((item) => {
+    // Obtiene el texto del elemento <li>
     const itemName = item.firstChild.textContent.toLowerCase();
     if (itemName.indexOf(filter_text) != -1) {
+      // Si hay coincidencias, muestra el elemento
       item.style.display = 'flex';
-    } else{
+    } else {
+      // Si no hay coincidencias, oculta el elemento
       item.style.display = 'none';
     }
   });
 }
 
-//Función checkItems
+// Verifica si hay elementos <li> en la lista y muestra u oculta los elementos de la interfaz según corresponda
 function checkItems() {
+  // Obtiene todos los elementos <li> de la lista
   const items = itemList.querySelectorAll('li');
-  //Verifica que existan items <li> en la lista <ul>
+
+  // Si no hay elementos <li> en la lista
   if (items.length === 0) {
-    //Si no los hay esconde el filtro y el boton "Limpiar todo"
+    // Oculta los elementos de filtro y el botón "Limpiar todo"
     clearBtn.style.display = 'none';
     itemFilter.style.display = 'none';
-    //Si los hay muestra el filtro y el boton "Limpiar todo"
   } else {
+    // Muestra los elementos de filtro y el botón "Limpiar todo"
     clearBtn.style.display = 'block';
     itemFilter.style.display = 'block';
   }
 }
 
 // Agregar los eventListeners
-itemForm.addEventListener('submit', addItem);
+itemForm.addEventListener('submit', onAddItemSubmit);
 itemList.addEventListener('click', removeItem);
 clearBtn.addEventListener('click', clearItems);
 itemFilter.addEventListener('input', filterItems);
+document.addEventListener('DOMContentLoaded', displayItems);
 checkItems();
