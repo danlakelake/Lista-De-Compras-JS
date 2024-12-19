@@ -165,7 +165,7 @@ function setItemToEdit(item) {
   // Agrega la clase 'edit-mode' al elemento seleccionado
   item.classList.add('edit-mode');
   // Cambia el texto y el ícono del botón del formulario para reflejar el modo de edición
-  formBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update item';
+  formBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Editar artículo';
   // Cambia el color de fondo del botón para indicar visualmente el modo de edición
   formBtn.style.backgroundColor = '#228B22';
   // Rellena el campo de entrada del formulario con el texto del ítem seleccionado
@@ -267,7 +267,7 @@ function checkItems() {
     itemFilter.style.display = 'block';
   }
   // Restablece el texto y el ícono del botón del formulario para reflejar el modo de agregar nuevos ítems
-  formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item';
+  formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Agregar artículo';
   // Cambia el color de fondo del botón para indicar que ya no está en modo de edición
   formBtn.style.backgroundColor = '#333';
   // Desactiva el modo de edición
